@@ -1,0 +1,22 @@
+{
+  "name": "tree-sitter-stardew-json",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for SMAPI's JSON dialect and Content Patcher tokens",
+  "license": "MIT OR Apache-2.0",
+  "repository": "github:eth0net/tree-sitter-stardew-json",
+  "tree-sitter": [
+    {
+      "scope": "source.stardew-json",
+      "file-types": [
+        "json"
+      ],
+      "injection-regex": "^stardew[-_]json$"
+    }
+  ],
+  "scripts": {
+    "test": "scripts/check.sh"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.25.10"
+  }
+}

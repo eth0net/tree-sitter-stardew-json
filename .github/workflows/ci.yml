@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  grammar:
+    name: generate and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      # The CLI ships a different binary per platform and the working tree is
+      # pinned to LF, both of which are only really tested by running here.
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: scripts/check.sh
+        shell: bash
+      # Fails if src/ was not regenerated after a grammar.js change.
+      - run: git diff --exit-code

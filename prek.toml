@@ -1,0 +1,38 @@
+# Git hooks, run by `prek` (https://prek.j178.dev).
+#:schema https://www.schemastore.org/prek.json
+#
+#     prek install
+
+default_install_hook_types = ["pre-commit", "pre-push"]
+
+# Everything under src/ is generated. A whitespace fixer touching it would put
+# the tree at odds with `tree-sitter generate`, which is exactly what the
+# regeneration check in CI exists to catch.
+exclude = '^src/'
+
+# Bundled with prek itself, so there is nothing to clone and no Python to
+# install: a fresh checkout can run these offline.
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "trailing-whitespace" },
+  { id = "end-of-file-fixer" },
+  # .gitattributes pins the working tree to LF; this catches a file that
+  # slipped in before it applied.
+  { id = "mixed-line-ending", args = ["--fix=lf"] },
+  { id = "check-merge-conflict" },
+  { id = "check-case-conflict" },
+  { id = "check-illegal-windows-names" },
+  { id = "check-toml" },
+  { id = "check-added-large-files" },
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  { id = "shellcheck", name = "shellcheck", entry = "shellcheck", language = "system", files = '^scripts/.*\.sh$' },
+
+  # Downloads the CLI on a cold checkout, so it waits for push rather than
+  # holding up every commit.
+  { id = "grammar", name = "tree-sitter generate and test", entry = "scripts/check.sh", language = "system", files = '^(grammar\.js|test/)', pass_filenames = false, require_serial = true, stages = ["pre-push"] },
+]

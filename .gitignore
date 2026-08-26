@@ -1,0 +1,6 @@
+node_modules/
+*.wasm
+.DS_Store
+
+# install.js drops the CLI here when run from the wrong directory
+/tree-sitter
