@@ -1,0 +1,122 @@
+================================================================================
+Bare token
+================================================================================
+
+{ "Target": "{{Season}}" }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (string (string_content (token name: (token_name)))))))
+
+================================================================================
+Token with input and filters
+================================================================================
+
+{ "A": "{{Random: a, b |key=x |contains=y}}" }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (string
+        (string_content
+          (token
+            name: (token_name)
+            input: (token_input (token_text) (token_text))
+            filter: (token_filter name: (token_filter_name) value: (token_input (token_text)))
+            filter: (token_filter name: (token_filter_name) value: (token_input (token_text)))))))))
+
+================================================================================
+Nested tokens and surrounding text
+================================================================================
+
+{ "A": "prefix_{{Random: {{Season}}, fall}}_suffix" }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (string
+        (string_content
+          (token
+            name: (token_name)
+            input: (token_input
+              (token name: (token_name))
+              (token_text))))))))
+
+================================================================================
+Mod-provided token name
+================================================================================
+
+{ "A": "{{Pathoschild.ExampleMod/SomeToken}}" }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (string (string_content (token name: (token_name)))))))
+
+================================================================================
+Token in a key
+================================================================================
+
+{ "Entries": { "{{TargetNpc}}": "Hi" } }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (object
+        (pair
+          key: (string (string_content (token name: (token_name))))
+          value: (string (string_content)))))))
+
+================================================================================
+Query expression
+================================================================================
+
+{ "When": { "Query: {{Time}} >= 1800": true } }
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (object
+        (pair
+          key: (string (string_content (token name: (token_name))))
+          value: (true))))))
+
+================================================================================
+Filter value mixing text and a nested token
+================================================================================
+
+["{{Random: a, b, c |key=Abigail portraits {{Time}} }}"]
+
+--------------------------------------------------------------------------------
+
+(document
+  (array
+    (string
+      (string_content
+        (token
+          name: (token_name)
+          input: (token_input (token_text) (token_text) (token_text))
+          filter: (token_filter
+            name: (token_filter_name)
+            value: (token_input
+              (token_text)
+              (token name: (token_name)))))))))

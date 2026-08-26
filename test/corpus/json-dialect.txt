@@ -1,0 +1,92 @@
+================================================================================
+Comments and trailing commas
+================================================================================
+
+{
+  // line comment
+  "Format": "2.8.0",
+  /* block
+     comment */
+  "Changes": [
+    { "Action": "Load", },
+  ],
+}
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (comment)
+    (pair
+      key: (string (string_content))
+      value: (string (string_content)))
+    (comment)
+    (pair
+      key: (string (string_content))
+      value: (array
+        (object
+          (pair
+            key: (string (string_content))
+            value: (string (string_content))))))))
+
+================================================================================
+Scalars
+================================================================================
+
+[1, -2.5, 1e3, true, false, null, ""]
+
+--------------------------------------------------------------------------------
+
+(document
+  (array
+    (number)
+    (number)
+    (number)
+    (true)
+    (false)
+    (null)
+    (string)))
+
+================================================================================
+Escapes and literal braces
+================================================================================
+
+["a\"b\\cé", "{not a token}", "http://example.com//x"]
+
+--------------------------------------------------------------------------------
+
+(document
+  (array
+    (string
+      (string_content
+        (escape_sequence)
+        (escape_sequence)))
+    (string (string_content))
+    (string (string_content))))
+
+================================================================================
+Single-quoted strings
+================================================================================
+
+{
+  'Actions': [
+    'Mod_MigrateIds CraftingRecipes "Puffer Plush" {{ModId}}_PufferPlush'
+  ],
+  "Mixed": 'it\'s "fine"'
+}
+
+--------------------------------------------------------------------------------
+
+(document
+  (object
+    (pair
+      key: (string (string_content))
+      value: (array
+        (string
+          (string_content
+            (token name: (token_name))))))
+    (pair
+      key: (string (string_content))
+      value: (string
+        (string_content
+          (escape_sequence))))))
