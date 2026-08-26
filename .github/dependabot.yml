@@ -1,0 +1,17 @@
+# `.github/dependabot.yml`. Dependabot reads only this spelling, so it is the
+# one place `.yml` beats the `.yaml` the rest of the repo uses.
+version: 2
+updates:
+  # Grouped so a week's bumps arrive as a single PR.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
