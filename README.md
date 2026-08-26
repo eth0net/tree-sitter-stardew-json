@@ -2,7 +2,7 @@
 
 A [Tree-sitter](https://tree-sitter.github.io) grammar for the JSON that
 [Stardew Valley](https://www.stardewvalley.net) mods are written in: SMAPI's
-dialect of JSON, with [Content
+dialect, with [Content
 Patcher](https://github.com/Pathoschild/StardewMods/tree/develop/ContentPatcher)
 tokens parsed as syntax rather than matched as text.
 
@@ -11,15 +11,12 @@ there is nothing Zed-specific in it.
 
 ## Why not tree-sitter-json
 
-**SMAPI's dialect is not strict JSON.** It parses with Json.NET, so `//` and
-`/* */` comments, trailing commas and single-quoted strings are all legal — and
-Content Patcher's own documentation uses the single quotes. A strict JSON
-grammar reports every one of these as a syntax error.
+SMAPI parses with Json.NET, so `//` and `/* */` comments, trailing commas and
+single-quoted strings are all legal — Content Patcher's own documentation uses
+the single quotes. A strict grammar reports every one as a syntax error.
 
-**Content Patcher tokens are structured.** `{{Random: sun, rain |key={{Day}}}}`
-is a name, an input list and a filter, with another token nested inside it.
-Injecting a separate token grammar into `(string_content)` gets you the outer
-braces and not much else; parsing them here gets the whole shape:
+Tokens are parsed rather than injected, which is what makes nesting and filters
+come out structured. `{{Random: sun, rain |key={{Day}}}}` is:
 
 ```
 (token
@@ -28,18 +25,18 @@ braces and not much else; parsing them here gets the whole shape:
   filter: (token_filter name: (token_filter_name) value: (token_input (token))))
 ```
 
-Tokens are recognised in values and in keys, which Content Patcher allows, and
-mod-provided names (`{{Some.Mod/Token}}`) parse as one name.
+Injecting a token grammar into `(string_content)` gets you the outer braces and
+little else. Tokens are recognised in keys as well as values, which Content
+Patcher allows, and `{{Some.Mod/Token}}` parses as one name.
 
 ## Nodes
 
 `document`, `object`, `pair`, `array`, `string`, `string_content`,
-`escape_sequence`, `number`, `true`, `false`, `null`, `comment`, and for tokens:
-`token`, `token_name`, `token_input`, `token_text`, `token_filter`,
-`token_filter_name`.
+`escape_sequence`, `number`, `true`, `false`, `null`, `comment`, `token`,
+`token_name`, `token_input`, `token_text`, `token_filter`, `token_filter_name`.
 
-The grammar's name is `stardew_json`, so the parser exports
-`tree_sitter_stardew_json`. A Zed extension has to register it under exactly
+The grammar is named `stardew_json`, so the parser exports
+`tree_sitter_stardew_json` and a Zed extension must register it under exactly
 that key.
 
 ## Development
@@ -50,12 +47,15 @@ scripts/check.sh tokens   # one corpus file
 ```
 
 `src/` is generated and committed, because consumers compile `src/parser.c`
-directly — Zed never runs `tree-sitter generate`. CI regenerates and then fails
-on any diff, so a `grammar.js` change that wasn't regenerated can't ship.
+directly — Zed never runs `tree-sitter generate`. CI regenerates and fails on
+any diff, so an unregenerated `grammar.js` change can't ship.
 
-The corpus in `test/corpus` covers the cases worth pinning: nested tokens,
-filters mixing literal text with a token, tokens in keys, `Query` expressions,
-comments, trailing commas, single quotes and literal braces inside strings.
+Checked against every JSON snippet in Content Patcher's author guide and 162
+files from a real content pack, with no parse errors. The committed corpus is
+separate and synthetic — a public fixture shouldn't carry someone's mod text —
+and pins the awkward cases: nested tokens, filters mixing text with a token,
+tokens in keys, `Query` expressions, comments, trailing commas, single quotes
+and literal braces in strings.
 
 ## Licence
 
